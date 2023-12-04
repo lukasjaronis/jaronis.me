@@ -14,6 +14,11 @@ const projects: Project[] = [
       "A Cloudflare worker service for creating and verifying API keys with optional constraints such as limited usage and or rate limiting. Powered by the Cache API and Durable Objects.",
     link: "https://github.com/lukasjaronis/cloud",
   },
+  {
+    name: 'Portfolio',
+    description: 'This site',
+    link: 'https://github.com/lukasjaronis/jaronis.me'
+  }
 ];
 
 export default function Projects() {
