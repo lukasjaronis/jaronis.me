@@ -22,6 +22,6 @@ export default function ProjectsLayout({
   children: React.ReactNode;
 }) {
   return (
-      <main className="pt-20 pb-[128px]">{children}</main>
+      <main className="pt-10 pb-[155px]">{children}</main>
   );
 }

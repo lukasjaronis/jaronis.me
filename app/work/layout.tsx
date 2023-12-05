@@ -22,7 +22,7 @@ export default function WorkLayout({
   children: React.ReactNode
 }) {
   return (
-    <main className='pt-10 pb-[128px]'>
+    <main className='pt-10 pb-[155px]'>
       {children}
     </main>
   )

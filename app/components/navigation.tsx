@@ -109,7 +109,7 @@ export const Navigation = () => {
           {pathname.charAt(0).toUpperCase() + pathname.slice(1)}
         </span>
       </div>
-      <div className="absolute bottom-5 right-10 flex flex-col items-center gap-4">
+      <div className="absolute bottom-5 right-5 flex flex-col items-center gap-4">
         <Link href="https://twitter.com/yebuntu" target="_blank">
           <XIcon className="h-3 w-3 text-ice-cold-500" />
         </Link>

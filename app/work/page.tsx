@@ -34,7 +34,7 @@ const experiences: Experience[] = [
 
 export default function Work() {
   return (
-    <section className="pt-20 flex items-start justify-center">
+    <section className="flex items-start justify-center">
       <div className="max-w-md">
         <ul className="flex flex-col gap-10">
           <li>
