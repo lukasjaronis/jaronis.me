@@ -37,7 +37,7 @@ export const Navigation = () => {
 
     timer = setTimeout(() => {
       setIsInitial(false);
-    }, 1000);
+    }, 1500);
 
     return () => {
       registeredLeftNav.unregister();
