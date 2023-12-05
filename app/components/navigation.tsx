@@ -10,10 +10,10 @@ import {
   EnvelopeClosedIcon,
 } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
-import { cn } from "../lib/cn";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { XIcon } from "../icons/x";
+import { Variants, motion } from "framer-motion";
 
 export const Navigation = () => {
   const [isInitial, setIsInitial] = useState(true);
@@ -37,7 +37,7 @@ export const Navigation = () => {
 
     timer = setTimeout(() => {
       setIsInitial(false);
-    }, 500);
+    }, 1000);
 
     return () => {
       registeredLeftNav.unregister();
@@ -65,6 +65,11 @@ export const Navigation = () => {
     const toggleDown = (event: KeyboardEvent) => {
       if (event.key === key) {
         event.preventDefault();
+
+        if (isInitial) {
+          setIsInitial(false)
+        }
+
         setTriggeredNav(key);
       }
     };
@@ -86,6 +91,16 @@ export const Navigation = () => {
 
     return false;
   };
+
+  const variants: Variants = {
+    hidden: {
+      scale: 0,
+    },
+    visible: {
+      scale: 1,
+    },
+    toggled: { scale: 0.9 }
+  }
 
   return (
     <div className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-center justify-center w-full backdrop-blur-sm h-32">
@@ -109,61 +124,60 @@ export const Navigation = () => {
         </Link>
       </div>
       <div className="flex flex-col items-center">
-        <div
-          className={`relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center ${
-            isTrigger("ArrowUp") && "scale-[.9]"
-          }`}
+        <motion.div
+          initial='hidden'
+          variants={variants}
+          animate={isTrigger("ArrowUp") ? 'toggled' : 'visible'}
+          className="relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center"
         >
           <TriangleUpIcon
-            className={cn(
-              "h-6 w-6 text-ice-cold-100",
-              triggeredNav === "ArrowUp" && "text-ice-cold-500 scale-[.9]"
-            )}
+            className='h-6 w-6 text-ice-cold-100'
           />
           {isTrigger("ArrowUp") && (
-            <span className="absolute bottom-10 right-1/2 translate-x-1/2 text-ice-cold-400 scale-[.9">
+            <span className="absolute bottom-12 right-1/2 translate-x-1/2 text-ice-cold-400">
               Intro
             </span>
           )}
-        </div>
+        </motion.div>
         <div className="flex">
-          <div
-            className={`relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center ${
-              isTrigger("ArrowLeft") && "scale-[.9]"
-            }`}
+          <motion.div
+              initial='hidden'
+              variants={variants}
+              animate={isTrigger("ArrowLeft") ? 'toggled' : 'visible'}
+            className="relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center"
           >
             <TriangleLeftIcon
-              className={cn(
-                "h-6 w-6 text-ice-cold-100",
-                triggeredNav === "ArrowLeft" && "text-ice-cold-500 scale-[.9]"
-              )}
+              className="h-6 w-6 text-ice-cold-100"
             />
             {isTrigger("ArrowLeft") && (
-              <span className="absolute top-1/2 -translate-y-1/2 right-10 text-ice-cold-400 scale-[.9]">
+              <span className="absolute top-1/2 -translate-y-1/2 right-12 text-ice-cold-400">
                 Work
               </span>
             )}
-          </div>
-          <div className=" w-10 h-10 flex items-center justify-center">
+          </motion.div>
+          <motion.div
+              initial='hidden'
+              variants={variants}
+              animate='visible'
+            className="w-10 h-10 flex items-center justify-center"
+          >
             <KeyboardIcon className="h-6 w-6 text-ice-cold-900" />
-          </div>
-          <div
-            className={`relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center ${
-              isTrigger("ArrowRight") && "scale-[.9]"
-            }`}
+          </motion.div>
+          <motion.div
+           initial='hidden'
+           variants={variants}
+           animate={isTrigger("ArrowRight") ? 'toggled' : 'visible'}
+            className="relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center"
           >
             <TriangleRightIcon
-              className={cn(
-                "h-6 w-6 text-ice-cold-100",
-                triggeredNav === "ArrowRight" && "text-ice-cold-500"
-              )}
+              className="h-6 w-6 text-ice-cold-100"
             />
             {isTrigger("ArrowRight") && (
-              <span className="absolute top-1/2 -translate-y-1/2 left-10 text-ice-cold-400 scale-[.9]">
+              <span className="absolute top-1/2 -translate-y-1/2 left-12 text-ice-cold-400">
                 Projects
               </span>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

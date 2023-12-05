@@ -6,8 +6,19 @@ import "./globals.css";
 import { Navigation } from "./components/navigation";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://yebuntu.vercel.app"),
   title: "Portfolio",
-  description: "Portfolio of Lukas Jaronis"
+  description: "Portfolio of Lukas Jaronis",
+  openGraph: {
+    title: "Portfolio",
+    description: "Portfolio of Lukas Jaronis",
+    url: "https://yebuntu.vercel.app",
+    siteName: "yebuntu.vercel.app",
+  },
+  twitter: {
+    title: "Yebuntu (Lukas Jaronis)",
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
