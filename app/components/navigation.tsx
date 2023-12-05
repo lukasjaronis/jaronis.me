@@ -103,7 +103,7 @@ export const Navigation = () => {
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-start justify-center w-full backdrop-blur-sm h-32">
+    <div id="navigation" className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-start justify-center w-full backdrop-blur-sm h-32">
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
         <span className="font-geist_mono text-ice-cold-500">
           {pathname.charAt(0).toUpperCase() + pathname.slice(1)}

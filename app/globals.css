@@ -5,3 +5,7 @@
 body {
   @apply relative bg-[#162226] text-blueberg-200 scrollbar-none px-3;
 }
+
+#navigation {
+  position: -webkit-sticky;
+}
