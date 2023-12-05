@@ -16,7 +16,7 @@ const projects: Project[] = [
   },
   {
     name: 'Portfolio',
-    description: 'This site',
+    description: 'This website.',
     link: 'https://github.com/lukasjaronis/jaronis.me'
   }
 ];

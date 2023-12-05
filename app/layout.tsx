@@ -7,7 +7,7 @@ import { Navigation } from "./components/navigation";
 
 export const metadata: Metadata = {
   title: "Portfolio",
-  description: "Portfolio of Lukas Jaronis",
+  description: "Portfolio of Lukas Jaronis"
 };
 
 export default function RootLayout({

@@ -5,10 +5,15 @@ import {
   TriangleUpIcon,
   TriangleRightIcon,
   KeyboardIcon,
+  GitHubLogoIcon,
+  LinkedInLogoIcon,
+  EnvelopeClosedIcon,
 } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import { cn } from "../lib/cn";
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { XIcon } from "../icons/x";
 
 export const Navigation = () => {
   const [isInitial, setIsInitial] = useState(true);
@@ -88,6 +93,20 @@ export const Navigation = () => {
         <span className="font-geist_mono text-ice-cold-500">
           {pathname.charAt(0).toUpperCase() + pathname.slice(1)}
         </span>
+      </div>
+      <div className="absolute bottom-5 right-10 flex flex-col items-center gap-4">
+        <Link href="https://twitter.com/yebuntu" target="_blank">
+          <XIcon className="h-3 w-3 text-ice-cold-500" />
+        </Link>
+        <Link href="https://github.com/lukasjaronis" target="_blank">
+          <GitHubLogoIcon className="h-4 w-4 text-ice-cold-500" />
+        </Link>
+        <Link href="https://www.linkedin.com/in/lukasjaronis/" target="_blank">
+          <LinkedInLogoIcon className="h-4 w-4 text-ice-cold-500" />
+        </Link>
+        <Link href="mailto:jaronislukas@gmail.com" target="_blank">
+          <EnvelopeClosedIcon className="h-4 w-4 text-ice-cold-500" />
+        </Link>
       </div>
       <div className="flex flex-col items-center">
         <div
