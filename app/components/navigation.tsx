@@ -67,7 +67,7 @@ export const Navigation = () => {
         event.preventDefault();
 
         if (isInitial) {
-          setIsInitial(false)
+          setIsInitial(false);
         }
 
         setTriggeredNav(key);
@@ -99,12 +99,12 @@ export const Navigation = () => {
     visible: {
       scale: 1,
     },
-    toggled: { scale: 0.9 }
-  }
+    toggled: { scale: 0.9 },
+  };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-center justify-center w-full backdrop-blur-sm h-32">
-      <div className="absolute bottom-5 left-10">
+    <div className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-start justify-center w-full backdrop-blur-sm h-32">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
         <span className="font-geist_mono text-ice-cold-500">
           {pathname.charAt(0).toUpperCase() + pathname.slice(1)}
         </span>
@@ -124,60 +124,57 @@ export const Navigation = () => {
         </Link>
       </div>
       <div className="flex flex-col items-center">
-        <motion.div
-          initial='hidden'
+        <motion.button
+          initial="hidden"
           variants={variants}
-          animate={isTrigger("ArrowUp") ? 'toggled' : 'visible'}
+          animate={isTrigger("ArrowUp") ? "toggled" : "visible"}
           className="relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center"
+          onClick={() => router.replace("/intro")}
         >
-          <TriangleUpIcon
-            className='h-6 w-6 text-ice-cold-100'
-          />
+          <TriangleUpIcon className="h-6 w-6 text-ice-cold-100" />
           {isTrigger("ArrowUp") && (
             <span className="absolute bottom-12 right-1/2 translate-x-1/2 text-ice-cold-400">
               Intro
             </span>
           )}
-        </motion.div>
+        </motion.button>
         <div className="flex">
-          <motion.div
-              initial='hidden'
-              variants={variants}
-              animate={isTrigger("ArrowLeft") ? 'toggled' : 'visible'}
+          <motion.button
+            initial="hidden"
+            variants={variants}
+            animate={isTrigger("ArrowLeft") ? "toggled" : "visible"}
             className="relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center"
+            onClick={() => router.replace("/work")}
           >
-            <TriangleLeftIcon
-              className="h-6 w-6 text-ice-cold-100"
-            />
+            <TriangleLeftIcon className="h-6 w-6 text-ice-cold-100" />
             {isTrigger("ArrowLeft") && (
               <span className="absolute top-1/2 -translate-y-1/2 right-12 text-ice-cold-400">
                 Work
               </span>
             )}
-          </motion.div>
+          </motion.button>
           <motion.div
-              initial='hidden'
-              variants={variants}
-              animate='visible'
+            initial="hidden"
+            variants={variants}
+            animate="visible"
             className="w-10 h-10 flex items-center justify-center"
           >
             <KeyboardIcon className="h-6 w-6 text-ice-cold-900" />
           </motion.div>
-          <motion.div
-           initial='hidden'
-           variants={variants}
-           animate={isTrigger("ArrowRight") ? 'toggled' : 'visible'}
+          <motion.button
+            initial="hidden"
+            variants={variants}
+            animate={isTrigger("ArrowRight") ? "toggled" : "visible"}
             className="relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center"
+            onClick={() => router.replace("/projects")}
           >
-            <TriangleRightIcon
-              className="h-6 w-6 text-ice-cold-100"
-            />
+            <TriangleRightIcon className="h-6 w-6 text-ice-cold-100" />
             {isTrigger("ArrowRight") && (
               <span className="absolute top-1/2 -translate-y-1/2 left-12 text-ice-cold-400">
                 Projects
               </span>
             )}
-          </motion.div>
+          </motion.button>
         </div>
       </div>
     </div>
