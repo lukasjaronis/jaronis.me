@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 body {
-  @apply relative bg-[#162226] text-blueberg-200 scrollbar-none px-3;
+  @apply relative bg-[#162226] text-blueberg-100 scrollbar-none px-3 selection:bg-black;
 }

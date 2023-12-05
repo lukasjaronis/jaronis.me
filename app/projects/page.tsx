@@ -4,7 +4,7 @@ import Link from "next/link";
 type Project = {
   name: string;
   description: string;
-  link: string;
+  link?: string;
 };
 
 const projects: Project[] = [
@@ -18,6 +18,10 @@ const projects: Project[] = [
     name: 'Portfolio',
     description: 'This website.',
     link: 'https://github.com/lukasjaronis/jaronis.me'
+  },
+  {
+    name: 'NFT Contract',
+    description: 'Implemented and deployed an Ethereum ERC-721 contract that uses bit shifting to create on-chain pseudo-randomness for NFT characteristic generation.',
   }
 ];
 
@@ -30,9 +34,11 @@ export default function Projects() {
             return (
               <li key={index}>
                 <div className="flex items-center space-x-2">
-                  <Link href={project.link} passHref target="_blank">
-                    <ExternalLinkIcon />
-                  </Link>
+                  {project.link && (
+                      <Link href={project.link} passHref target="_blank">
+                      <ExternalLinkIcon />
+                    </Link>
+                  )}
                   <h4 className="font-geist_mono text-ice-cold-500">{project.name}</h4>
                 </div>
                 <p className="text-blueberg-400">{project.description}</p>

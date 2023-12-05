@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 type Experience = {
   name: string;
   description: string;
-  link: string;
+  link?: string;
   role: string;
   date: string;
 };
@@ -20,7 +20,7 @@ const experiences: Experience[] = [
       "A chain-agnostic NFT marketplace at its core and a full service web3 launchpad.",
     link: "https://byt.io/launchpad",
     role: "Full Stack Engineer",
-    date: "12.2021 - 09.2023",
+    date: "12.2021 - 09.2023 (1.75yrs)",
   },
   {
     name: "Ideafire",
@@ -28,7 +28,7 @@ const experiences: Experience[] = [
       "Ideafire is where Youtube, TikTok, X (Twitter), Instagram and more all come together as one so you can discover and create things that define who you are and what you intend to do.",
     link: "https://www.youtube.com/watch?v=UUiRVTEBJaU",
     role: "Full Stack Engineer",
-    date: "09.2019 - 12.2021",
+    date: "09.2019 - 12.2021 (2.25 yrs)",
   }
 ];
 
@@ -44,9 +44,11 @@ export default function Work() {
             return (
               <li key={index}>
                 <div className="flex items-center space-x-2">
+                  {experience.link && (
                   <Link href={experience.link} passHref target="_blank">
-                    <ExternalLinkIcon />
-                  </Link>
+                  <ExternalLinkIcon />
+                </Link>
+                  )}
                   <h4 className="font-geist_mono text-ice-cold-500">{experience.name}</h4>
                 </div>
                 <p className='font-geist_mono text-sm py-1'>{experience.role}</p>

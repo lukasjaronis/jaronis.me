@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { XIcon } from "../icons/x";
-import { Variants, motion } from "framer-motion";
+import { AnimatePresence, Variants, motion } from "framer-motion";
 
 export const Navigation = () => {
   const [isInitial, setIsInitial] = useState(true);
@@ -103,7 +103,10 @@ export const Navigation = () => {
   };
 
   return (
-    <div id="navigation" className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-start justify-center w-full backdrop-blur-sm h-32">
+    <div
+      id="navigation"
+      className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-start justify-center w-full backdrop-blur-sm h-32"
+    >
       <div className="absolute bottom-2 left-1/2 -translate-x-1/2">
         <span className="font-geist_mono text-ice-cold-500">
           {pathname.charAt(0).toUpperCase() + pathname.slice(1)}
@@ -159,7 +162,7 @@ export const Navigation = () => {
             animate="visible"
             className="w-10 h-10 flex items-center justify-center"
           >
-            <KeyboardIcon className="h-6 w-6 text-ice-cold-900" />
+            <KeyboardIcon className="h-6 w-6 text-ice-cold-100" />
           </motion.div>
           <motion.button
             initial="hidden"
