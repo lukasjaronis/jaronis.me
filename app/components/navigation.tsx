@@ -22,6 +22,7 @@ type Pages = "intro" | 'projects' | 'work'
 export const Navigation = () => {
 	const [isInitial, setIsInitial] = useState(true);
 	const pathname = usePathname().replace("/", "") as Pages
+	const isContent = pathname.includes('posts/')
 	const router = useRouter();
 
 	const [triggeredNav, setTriggeredNav] = useState<TriggerNav>(undefined);
@@ -102,11 +103,13 @@ export const Navigation = () => {
 			id="navigation"
 			className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-start justify-center w-full backdrop-blur-sm h-32"
 		>
+			{!isContent && (
 			<div className="absolute bottom-2 left-1/2 -translate-x-1/2">
-				<span className="font-geist_mono text-ice-cold-500">
-					{pathname.charAt(0).toUpperCase() + pathname.slice(1)}
-				</span>
-			</div>
+			<span className="font-geist_mono text-ice-cold-500">
+				{pathname.charAt(0).toUpperCase() + pathname.slice(1)}
+			</span>
+		</div>
+			)}
 			<div className="absolute bottom-5 right-5 flex flex-col items-center gap-4">
 				<Link href="https://twitter.com/yebuntu" target="_blank">
 					<XIcon className="h-3 w-3 text-ice-cold-500" />
@@ -127,7 +130,7 @@ export const Navigation = () => {
 					initial="hidden"
 					variants={variants}
 					animate={onTriggerDown("ArrowUp") ? "toggled" : "visible"}
-					className={cn("group relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center", (!isInitial && pathname === 'intro') && 'disabled:opacity-5')}
+					className={cn("group relative bg-firefly-900 border-1 border-firefly-800 rounded-lg w-10 h-10 flex items-center justify-center", (!isInitial && pathname === 'intro') && 'disabled:opacity-5')}
 					onClick={() => router.replace("/intro")}
 				>
 					<TriangleUpIcon className="h-6 w-6 text-ice-cold-100" />
@@ -148,7 +151,7 @@ export const Navigation = () => {
 						initial="hidden"
 						variants={variants}
 						animate={onTriggerDown("ArrowLeft") ? "toggled" : "visible"}
-						className={cn("group relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center", (!isInitial && pathname === 'work') && 'disabled:opacity-5')}
+						className={cn("group relative bg-firefly-900 border-1 border-firefly-800 rounded-lg w-10 h-10 flex items-center justify-center", (!isInitial && pathname === 'work') && 'disabled:opacity-5')}
 						onClick={() => router.replace("/work")}
 					>
 						<TriangleLeftIcon className="h-6 w-6 text-ice-cold-100" />
@@ -176,7 +179,7 @@ export const Navigation = () => {
 						initial="hidden"
 						variants={variants}
 						animate={onTriggerDown("ArrowRight") ? "toggled" : "visible"}
-						className={cn("group relative border-1 border-blueberg-800 rounded-lg w-10 h-10 flex items-center justify-center", (!isInitial && pathname === 'projects') && 'disabled:opacity-5')}
+						className={cn("group relative bg-firefly-900 border-1 border-firefly-800 rounded-lg w-10 h-10 flex items-center justify-center", (!isInitial && pathname === 'projects') && 'disabled:opacity-5')}
 						onClick={() => router.replace("/projects")}
 					>
 						<TriangleRightIcon className="h-6 w-6 text-ice-cold-100" />

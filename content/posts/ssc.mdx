@@ -1,0 +1,1105 @@
+---
+title: Spaced Star Club
+---
+
+To preface this, all of this information is based off a few years ago.
+
+This project was an introduction to Solidity and the overall space of web3 development. 
+Something I learned quite quickly was that blockchain development is unforgiving and securing the 
+way you architect your idea is very important. Once your contract is pubished and it starts consuming $$$
+there is only so much you can do once a vulnerability is detected.
+
+#### generation --- on-chain vs off-chain
+
+Majority of the biggest NFT brands (Doodles, BAYC, Invisible Friends, etc) at the time were off-chain 
+generated. The only clear positive is the choice to choose what gets through to the final collection. 
+
+The clear negatives are knowing exactly which token IDs are the rarest, and de-utilizing the blockchain. 
+The only provenance you have is a token ID that references IPFS metadata, and if a contract owner changes 
+that IPFS reference, your wallet is going to own a token ID-- thats it.
+
+On-chain generation is a bit more complex:
+- The maximum contract size is 24KB (24,576 bytes), so depending on the implementation, it
+might force you to split your contract into multiple different contracts (more $$$ needed for deployment), 
+usually a **logic** contract & a **mint** contract.
+- Have to figure out how to achieve randomness or else somebody will reverse-engineer your contract and figure out
+which token ID is the rarest and when to mint it. ([Chainlink VRF](https://docs.chain.link/vrf/v2/estimating-costs?network=ethereum-mainnet) is the best solution but it has a cost.)
+
+#### adventure
+ 
+Me, my partner, and two other friends took on the common roles of an NFT project:
+- Me (Contract Dev + Web)
+- Monika (Branding + Graphics + UI)
+- Friend (Research + Arweave deployment + Python king + a helping hand)
+- Friend (Marketing + Community)
+
+The first iteration was **AstroStars** that looked like this.
+
+    <Image src="/images/astrostars_nft.png" width={175} height={175} alt="Astro Stars NFT" />
+
+We started the community and marketing very early with this one, and gained a bit of traction
+with roughly ~350 discord members.
+
+After some thought we decided that this design didn't meet branding PFP standards we originally
+wanted.
+
+The next iteration was put in motion quickly with a bigger scope, but ultimately we took too much time, and we 
+lost all of our hype while the NFT trend was dwindling down. 
+
+NFTs looked like this.
+
+    <Container className="flex mt-2">
+      <Image src="/images/ssc_nft_1.png" width={150} height={150} alt="SSC NFT 1" className="border rounded-lg overflow-hidden" />
+      <Image src="/images/ssc_nft_2.png" width={150} height={150} alt="SSC NFT 1" className="border rounded-lg overflow-hidden" />
+      <Image src="/images/ssc_nft_3.png" width={150} height={150} alt="SSC NFT 1" className="border rounded-lg overflow-hidden" />
+    </Container>
+
+
+Monika hand-drew every bit of this masterpiece.
+
+    <Image src="/images/ssc_hero.png" width={1000} height={1000} alt="StarPeep Hero" className="mt-2 border rounded-lg overflow-hidden" />
+
+We were rushing against time, so we ended up deploying a minimal off-chain contract in the end.
+
+    <CodeBlock expandButtonTitle="SSC Contract">
+    ```solidity
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity 0.8.9;
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract SSC is ERC721, ReentrancyGuard, Ownable {
+  using Counters for Counters.Counter;
+  Counters.Counter internal tokenIdCounter;
+
+  string public provenance;
+
+  bool public isRevealed;
+  bool public isClaimActive;
+
+  string public baseURI;
+  string public preRevealURI;
+
+  uint256 public maxSupply;
+
+  mapping(address => bool) hasAddressMinted;
+
+  function setProvenance(string memory _provenance) external onlyOwner {
+    provenance = _provenance;
+  }
+
+  function setClaimActive() external onlyOwner {
+    isClaimActive = !isClaimActive;
+  }
+
+  function setIsRevealed() external onlyOwner {
+    isRevealed = !isRevealed;
+  }
+
+  function setBaseURI(string memory _baseURI) external onlyOwner {
+    baseURI = _baseURI;
+  }
+
+  function setPreRevealURI(string memory _preRevealURI) external onlyOwner {
+    preRevealURI = _preRevealURI;
+  }
+
+  function getBaseURI() public view virtual returns (string memory) {
+    return baseURI;
+  }
+
+  function getSupply() external view returns (uint256) {
+    return tokenIdCounter.current();
+  }
+
+  function claim() public nonReentrant {
+    require(isClaimActive, "Claim is not active");
+    require(!hasAddressMinted[_msgSender()], "Already claimed.");
+    require(
+			tokenIdCounter.current() + 1 <= maxSupply,
+			"Exceeds max supply."
+		);
+
+    tokenIdCounter.increment();
+    _safeMint(_msgSender(), tokenIdCounter.current());
+
+    hasAddressMinted[_msgSender()] = true;
+  }
+
+  function tokenURI(uint256 _tokenId) public view override returns (string memory) {
+   require(_exists(_tokenId), "ERC721Metadata: URI query for nonexistent token");
+    
+    if (!isRevealed) {
+      return preRevealURI;
+    }
+
+    return string(abi.encodePacked(baseURI, abi.encodePacked(_toString(_tokenId)), ".json"));
+  }
+
+  function _toString(uint256 value) internal pure returns (string memory) {
+		// Inspired by OraclizeAPI's implementation - MIT license
+		// https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
+
+		if (value == 0) {
+			return "0";
+		}
+		uint256 temp = value;
+		uint256 digits;
+		while (temp != 0) {
+			digits++;
+			temp /= 10;
+		}
+		bytes memory buffer = new bytes(digits);
+		while (value != 0) {
+			digits -= 1;
+			buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+			value /= 10;
+		}
+		return string(buffer);
+	}
+
+  constructor() ERC721("Spaced Star Club", 'SSC') Ownable() {
+    isClaimActive = false;
+    isRevealed = false;
+    maxSupply = 5000;
+    provenance = "";
+  }
+}
+```
+    </CodeBlock>
+
+The actual contract I was working on is below.
+
+    <CodeBlock expandButtonTitle="Mint Contract">
+    ```solidity
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity 0.8.9;
+
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+import "./SSCLogic.sol";
+
+/**
+    Things to think about:
+
+    When minting is finished, how do we stop rarity sniping.
+    (i.e sniping on the marketplace for the rare tokens)
+ */
+contract SSC is ERC721, ReentrancyGuard, Ownable {
+	using Counters for Counters.Counter;
+
+	Counters.Counter public tokenIdCounter;
+
+	address public logicContract;
+	address public immutable proxyRegistryAddress; // Remove OS fees on approval
+
+	bool public isRevealed;
+	bool public isActive;
+
+	string public arweaveURI;
+	string public preRevealURI;
+
+	uint256 public cost = 0.055 ether;
+	uint256 public maxSupply;
+
+	mapping(uint256 => uint256) public tokenToSSC;
+	mapping(address => bool) proxyToApproved;
+
+	function setIsActive(bool _newState) external onlyOwner {
+		isActive = _newState;
+	}
+
+	function setIsRevealed(bool _newState) external onlyOwner {
+		isRevealed = _newState;
+	}
+
+	function setArweaveURI(string memory _newURI) external onlyOwner {
+		arweaveURI = _newURI;
+	}
+
+	function setPreRevealURI(string memory _newURI) external onlyOwner {
+		preRevealURI = _newURI;
+	}
+
+	function mintPublic(uint256 _mintAmount) public payable nonReentrant {
+		require(isActive, "Minting is not active.");
+		require(
+			tokenIdCounter.current() + _mintAmount <= maxSupply,
+			"Exceeds max supply."
+		);
+		require(msg.value >= cost * _mintAmount, "Ether value sent is invalid.");
+
+		for (uint256 i = 0; i < _mintAmount; i++) {
+			tokenIdCounter.increment();
+			mintSSC(_msgSender(), tokenIdCounter.current());
+		}
+	}
+
+	function mintSSC(address _address, uint256 _tokenID) private {
+		SSCLogic LogicContract = SSCLogic(logicContract);
+
+		uint256 seed = LogicContract.getSeed(_address, _tokenID);
+
+		if (seed > 0) {
+			tokenToSSC[_tokenID] = seed;
+		}
+
+		_safeMint(_address, _tokenID);
+	}
+
+	function getBackground(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getBackground(_tokenID);
+
+		return output;
+	}
+
+	function getSkin(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getSkin(_tokenID);
+
+		return output;
+	}
+
+	function getEyes(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getEyes(_tokenID);
+
+		return output;
+	}
+
+	function getGlasses(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getGlasses(_tokenID);
+
+		return output;
+	}
+
+	function getMouth(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getMouth(_tokenID);
+
+		return output;
+	}
+
+	function getEaring(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getEaring(_tokenID);
+
+		return output;
+	}
+
+	function getTop(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getTop(_tokenID);
+
+		return output;
+	}
+
+	function getHat(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getHat(_tokenID);
+
+		return output;
+	}
+
+	function getOneOff(uint256 _tokenID) external view returns (string memory) {
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return "Not Revealed";
+		}
+
+		string memory output;
+
+		SSCLogic LogicContract = SSCLogic(logicContract);
+		output = LogicContract.getOneOff(_tokenID);
+
+		return output;
+	}
+
+	// BASEURI has to have a `/` at the end!
+	function tokenURI(uint256 _tokenID)
+		public
+		view
+		override
+		returns (string memory)
+	{
+		require(_exists(_tokenID), "Token doesn't exist.");
+
+		if (!isRevealed) {
+			return preRevealURI;
+		}
+
+		return
+			string(abi.encodePacked(arweaveURI, abi.encodePacked(_toString(_tokenID))));
+	}
+
+	function flipProxyState(address _proxyAddress) public onlyOwner {
+		proxyToApproved[_proxyAddress] = !proxyToApproved[_proxyAddress];
+	}
+
+	function isApprovedForAll(address _owner, address _operator)
+		public
+		view
+		override
+		returns (bool)
+	{
+		OpenSeaProxyRegistry proxyRegistery = OpenSeaProxyRegistry(
+			proxyRegistryAddress
+		);
+		if (address(proxyRegistery.proxies(_owner)) == _operator) return true;
+		return super.isApprovedForAll(_owner, _operator);
+	}
+
+	function _toString(uint256 value) internal pure returns (string memory) {
+		// Inspired by OraclizeAPI's implementation - MIT license
+		// https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
+
+		if (value == 0) {
+			return "0";
+		}
+		uint256 temp = value;
+		uint256 digits;
+		while (temp != 0) {
+			digits++;
+			temp /= 10;
+		}
+		bytes memory buffer = new bytes(digits);
+		while (value != 0) {
+			digits -= 1;
+			buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+			value /= 10;
+		}
+		return string(buffer);
+	}
+
+	constructor(address _logicContract, address _proxyRegistryAddress)
+		ERC721("Spaced Star Club", "SSC")
+		Ownable()
+	{
+		isActive = false;
+		isRevealed = false;
+		maxSupply = 7056;
+		logicContract = _logicContract;
+		proxyRegistryAddress = _proxyRegistryAddress;
+	}
+}
+
+contract OwnableDelegateProxy {}
+
+contract OpenSeaProxyRegistry {
+	mapping(address => OwnableDelegateProxy) public proxies;
+}
+
+```
+    </CodeBlock>
+
+    <CodeBlock expandButtonTitle="Logic Contract">
+    ```solidity
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity 0.8.9;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
+import "./SSC.sol";
+
+contract SSCLogic is Ownable {
+	address mintContract;
+
+	string[] private backgrounds = [
+		"Beige",
+		"Grey",
+		"Light Blue",
+		"Light Brown",
+		"Lime",
+		"Purple",
+		"Sage"
+	];
+
+	string[] private skin = [
+		"Skin 1",
+		"Skin 2",
+		"Skin 3",
+		"Skin 4",
+		"Skin 5",
+		"Skin 6",
+		"Skin 7"
+	];
+
+	string[] private eyes = [
+		"Eyes 1",
+		"Eyes 2",
+		"Eyes 3",
+		"Eyes 4",
+		"Eyes 5",
+		"Eyes 6",
+		"Eyes 7"
+	];
+
+	string[] private glasses = [
+		"Glasses 1",
+		"Glasses 2",
+		"Glasses 3",
+		"Glasses 4",
+		"Glasses 5",
+		"Glasses 6",
+		"Glasses 7"
+	];
+
+	string[] private mouth = [
+		"Mouth 1",
+		"Mouth 2",
+		"Mouth 3",
+		"Mouth 4",
+		"Mouth 5",
+		"Mouth 6",
+		"Mouth 7"
+	];
+
+	string[] private earings = [
+		"Black Stud",
+		"Gold Bar",
+		"Gold Cross",
+		"Gold Stud",
+		"Pearl Stud",
+		"Silver Bar",
+		"Silver Cross",
+		"Silver Stud"
+	];
+
+	string[] private top = [
+		"Top 1",
+		"Top 2",
+		"Top 3",
+		"Top 4",
+		"Top 5",
+		"Top 6",
+		"Top 7"
+	];
+
+	string[] private hat = [
+		"Hat 1",
+		"Hat 2",
+		"Hat 3",
+		"Hat 4",
+		"Hat 5",
+		"Hat 6",
+		"Hat 7"
+	];
+
+	struct SpacedStar {
+		uint256 background;
+		uint256 skin;
+		uint256 eyes;
+		uint256 glasses;
+		uint256 mouth;
+		uint256 earing;
+		uint256 top;
+		uint256 hat;
+	}
+
+	// Token ID => OneOFF
+	mapping(uint256 => string) tokenToOneOff;
+	string[] private oneOffAvailability = [
+		"Fear and Loathing in Las Vegas",
+		"Bucket Hat",
+		"Playboy"
+	];
+
+	modifier onlyMint() {
+		require(msg.sender == mintContract, "not authorized");
+		_;
+	}
+
+	function setMintContract(address _mintAddress) external onlyOwner {
+		mintContract = _mintAddress;
+	}
+
+	function genBackground(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "background"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 800) {
+			// Less than 80%
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			// less than 95%
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 1) + 6; // 6
+		}
+
+		return output;
+	}
+
+	function genSkin(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "skin"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 800) {
+			// Less than 80%
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			// less than 95%
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 1) + 6; // 6
+		}
+
+		return output;
+	}
+
+	function genEyes(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "eyes"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 800) {
+			// Less than 80%
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			// less than 95%
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 1) + 6; // 6
+		}
+
+		return output;
+	}
+
+	function genGlasses(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "glasses"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 800) {
+			// Less than 80%
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			// less than 95%
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 1) + 6; // 6
+		}
+
+		return output;
+	}
+
+	function genMouth(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "mouth"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 800) {
+			// Less than 80%
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			// less than 95%
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 1) + 6; // 6
+		}
+
+		return output;
+	}
+
+	function genEaring(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "earing"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 250) {
+			output = 404; // 404 is NONE
+		} else if (percent < 650) {
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 2) + 6; // 6-7
+		}
+
+		return output;
+	}
+
+	function genTop(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "top"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 800) {
+			// Less than 80%
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			// less than 95%
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 1) + 6; // 6
+		}
+
+		return output;
+	}
+
+	function genHat(uint256 _tokenID) internal view returns (uint256) {
+		SSC MintContract = SSC(mintContract);
+		uint256 seed = MintContract.tokenToSSC(_tokenID);
+		uint256 snip = snipHash(seed, "hat"); // 5-6 random digits
+		uint256 percent = snip % 1000;
+
+		uint256 output;
+		if (percent < 800) {
+			// Less than 80%
+			output = snip % 3; // 0-2
+		} else if (percent < 950) {
+			// less than 95%
+			output = (snip % 3) + 3; // 3-5
+		} else {
+			output = (snip % 1) + 6; // 6
+		}
+
+		return output;
+	}
+
+	function getBackground(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			return backgrounds[genBackground(_tokenID)];
+		}
+	}
+
+	function getSkin(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			return skin[genSkin(_tokenID)];
+		}
+	}
+
+	function getEyes(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			return eyes[genEyes(_tokenID)];
+		}
+	}
+
+	function getGlasses(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			return glasses[genGlasses(_tokenID)];
+		}
+	}
+
+	function getMouth(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			return mouth[genMouth(_tokenID)];
+		}
+	}
+
+	function getEaring(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			uint256 picked = genEaring(_tokenID);
+
+			if (picked == 404) {
+				return "None";
+			} else {
+				return earings[picked];
+			}
+		}
+	}
+
+	function getTop(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			return top[genTop(_tokenID)];
+		}
+	}
+
+	function getHat(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return "None";
+		} else {
+			return hat[genHat(_tokenID)];
+		}
+	}
+
+	function getOneOff(uint256 _tokenID) public view returns (string memory) {
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return tokenToOneOff[_tokenID];
+		} else {
+			return "No";
+		}
+	}
+
+	function retrieveAttributes(uint256 _tokenID)
+		external
+		view
+		onlyOwner
+		returns (string memory)
+	{
+		string memory seperator = "-";
+
+		bytes memory oneOffString = bytes(tokenToOneOff[_tokenID]);
+		if (oneOffString.length > 0) {
+			return
+				string(
+					abi.encodePacked(
+						tokenToOneOff[_tokenID]
+					)
+				);
+		} else {
+			return
+				string(
+					abi.encodePacked(
+						abi.encodePacked(
+							_toString(genBackground(_tokenID)),
+							seperator,
+							_toString(genSkin(_tokenID)),
+							seperator,
+							_toString(genEyes(_tokenID))
+						),
+						abi.encodePacked(
+							seperator,
+							_toString(genGlasses(_tokenID)),
+							seperator,
+							_toString(genMouth(_tokenID)),
+							seperator,
+							_toString(genEaring(_tokenID))
+						),
+						abi.encodePacked(
+							seperator,
+							_toString(genTop(_tokenID)),
+							seperator,
+							_toString(genHat(_tokenID))
+						)
+					)
+				);
+				/**
+					ex: 
+
+						'0-1-1-2-4-404-2-0'
+						'Bucket Hat'
+				 */
+		}
+	}
+
+	function snipHash(uint256 _seed, string memory _trait)
+		private
+		pure
+		returns (uint256)
+	{
+		// 1-240
+		uint256 section = uint256(keccak256(abi.encodePacked(_seed, _trait)));
+		uint256 module = (section % 240) + 1;
+		return uint256((_seed >> module) & 0xFFFF);
+	}
+
+	function getSeed(address _address, uint256 _tokenID)
+		external
+		returns (uint256)
+	{
+		uint256 seed = uint256(
+			keccak256(
+				abi.encodePacked(
+					block.timestamp +
+						block.difficulty +
+						((uint256(keccak256(abi.encodePacked(block.coinbase)))) /
+							(block.timestamp)) +
+						block.gaslimit +
+						((uint256(keccak256(abi.encodePacked(_address, _tokenID)))) /
+							(block.timestamp)) +
+						block.number
+				)
+			)
+		);
+
+		uint256 oneOffAvailabilityLength = oneOffAvailability.length;
+		uint256 section = snipHash(seed, "oneOff");
+		uint256 percent = section % 1000;
+
+		if (oneOffAvailabilityLength > 0 && percent > 998) {
+			uint256 pickedIndex = section % oneOffAvailabilityLength;
+
+			// Link one off to token
+			tokenToOneOff[_tokenID] = oneOffAvailability[pickedIndex];
+
+			/**
+			Remove
+			 */
+			oneOffAvailability[pickedIndex] = oneOffAvailability[
+				oneOffAvailabilityLength - 1
+			];
+			oneOffAvailability.pop();
+
+			return 0;
+		} else {
+			return seed;
+		}
+	}
+
+	function _toString(uint256 value) internal pure returns (string memory) {
+		// Inspired by OraclizeAPI's implementation - MIT license
+		// https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol
+
+		if (value == 0) {
+			return "0";
+		}
+		uint256 temp = value;
+		uint256 digits;
+		while (temp != 0) {
+			digits++;
+			temp /= 10;
+		}
+		bytes memory buffer = new bytes(digits);
+		while (value != 0) {
+			digits -= 1;
+			buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+			value /= 10;
+		}
+		return string(buffer);
+	}
+}
+
+```
+    </CodeBlock>
+
+<CodeBlock expandButtonTitle="Testing">
+```js
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
+const fs = require("fs");
+
+describe(`SSC Contract Testing`, () => {
+  let accounts;
+
+  beforeEach(async () => {
+    const SSCLogic = await ethers.getContractFactory("SSCLogic");
+    logicContract = await SSCLogic.deploy();
+
+    const SSC = await ethers.getContractFactory("SSC");
+    mintContract = await SSC.deploy(logicContract.address, '0x...');
+
+    await logicContract.setMintContract(mintContract.address);
+    [mintOwner, ...accounts] = await ethers.getSigners();
+  });
+
+  it(`should return correct contract state from constructor`, async () => {
+    expect(await mintContract.maxSupply()).to.equal(7056);
+    expect(await mintContract.maxSupply()).to.not.be.equal(7057);
+    expect(await mintContract.isActive()).to.be.false;
+    expect(await mintContract.logicContract()).to.be.equal(
+      logicContract.address
+    );
+  });
+
+  it(`should mint some`, async () => {
+    await mintContract.setIsActive(true)
+    let file = fs.createWriteStream("distribution/array.txt");
+    let mintAmount = 1
+    let data = []
+    for (let i = 1; i <= mintAmount; i++) {
+      await expect(
+        mintContract.connect(accounts[i]).mintPublic(i, {
+          value: ethers.utils.parseEther('0.055')
+        })
+      ).to.emit(mintContract, 'Transfer').withArgs(ethers.constants.AddressZero, accounts[i].address, i)
+
+      expect(await mintContract.balanceOf(accounts[i].address)).to.equal(1)
+      expect(await mintContract.balanceOf(accounts[i].address)).to.not.equal(2)
+
+      await mintContract.setIsRevealed(true)
+      
+      let seed = await mintContract.tokenToSSC(i)
+  
+      let background = await mintContract.getBackground(i)
+  
+      let skin = await mintContract.getSkin(i)
+  
+      let eyes = await mintContract.getEyes(i)
+  
+      let glasses = await mintContract.getGlasses(i)
+  
+      let mouth = await mintContract.getMouth(i)
+  
+      let earing = await mintContract.getEaring(i)
+  
+      let top = await mintContract.getTop(i)
+  
+      let hat = await mintContract.getHat(i)
+    
+      let oneOff = await mintContract.getOneOff(i)
+
+      let stringAttributes = await logicContract.retrieveAttributes(i)
+
+      data.push({
+        token: i,
+        seed: seed.toString(),
+        background,
+        skin,
+        eyes,
+        glasses,
+        mouth,
+        earing,
+        top,
+        hat,
+        oneOff,
+        stringAttributes
+      })
+    }
+
+    let distData = []
+    for (let i = 1; i <= mintAmount; i++) {
+      let stringAttributes = await logicContract.retrieveAttributes(i)
+      distData.push(stringAttributes)
+    }
+
+    file.on("error", function (err) {
+      console.log(err, "error");
+    });
+
+    distData.forEach(function (v) {
+      console.log(`Writing Token ${v.token}`)
+      file.write(v.stringAttributes + "\n");
+    });
+
+    file.end();
+  });
+});
+```
+</CodeBlock>
+
+<CodeBlock expandButtonTitle="Distribution">
+```python
+import pandas as pd 
+from collections import Counter
+import matplotlib.pyplot as plt
+
+out_list = []
+n_attributes = 6
+
+with open('array.txt') as f:
+    for line in f:
+        out_list.append(line.replace('\n', ''))
+    
+df = pd.DataFrame([x.split(',') for x in out_list], 
+                 columns = [f"attr{i}" for i in range(1,n_attributes+1,1)])
+
+
+n_plots = len(df.columns)
+fig, ax = plt.subplots(n_plots, figsize = (2*n_plots, 16 ), facecolor = 'w')
+plt.subplots_adjust(hspace = 0.4)
+cnt = 0
+for col in df.columns:
+    df[col] = df[col].apply(int)
+    df[col].value_counts().sort_index().plot.bar(ax = ax[cnt])
+    ax[cnt].set_title(col)
+    
+    cnt += 1
+```
+</CodeBlock>
+
+Bad screenshot, but fair distribution for the most part
+<Image src="/images/ssc_distribution.png" width={1000} height={1000} alt="SSC Distribution" className="mt-2 border rounded-lg overflow-hidden" />
+
+Anyways, it was a fun ride, and I learned a lot 👍

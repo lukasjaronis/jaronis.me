@@ -1,10 +1,11 @@
-import { ExternalLinkIcon } from "@radix-ui/react-icons";
+import { CrumpledPaperIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 
 type Project = {
 	name: string;
 	description: string;
 	link?: string;
+	blog?: string
 };
 
 const projects: Project[] = [
@@ -20,9 +21,10 @@ const projects: Project[] = [
 		link: "https://github.com/lukasjaronis/jaronis.me",
 	},
 	{
-		name: "NFT Contract",
+		name: "Spaced Star Club (nft project)",
 		description:
-			"Implemented and deployed an Ethereum ERC-721 contract that uses bit shifting to create on-chain pseudo-randomness for NFT characteristic generation.",
+			"Implemented and deployed an Ethereum ERC-721 contract + UI + cloud deployment.",
+		blog: '/posts/ssc'
 	},
 ];
 
@@ -40,11 +42,16 @@ export default function Projects() {
 											<ExternalLinkIcon />
 										</Link>
 									)}
+									{project.blog && (
+											<Link href={project.blog} passHref target="_blank">
+											<CrumpledPaperIcon />
+										</Link>
+									)}
 									<h4 className="font-geist_mono text-ice-cold-500">
 										{project.name}
 									</h4>
 								</div>
-								<p className="text-blueberg-400">{project.description}</p>
+								<p className="text-firefly-400">{project.description}</p>
 							</li>
 						);
 					})}

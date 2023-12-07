@@ -54,11 +54,11 @@ export default function Work() {
 									</h4>
 								</div>
 								<p className="font-geist_mono text-sm py-1">{experience.role}</p>
-								<p className="font-geist_mono text-xs py-1 text-blueberg-500">
+								<p className="font-geist_mono text-xs py-1 text-firefly-500">
 									{experience.date}
 								</p>
-								<div className="border-b-1 border-blueberg-800 my-1" />
-								<p className="text-blueberg-400">{experience.description}</p>
+								<div className="border-b-1 border-firefly-800 my-1" />
+								<p className="text-firefly-400">{experience.description}</p>
 							</li>
 						);
 					})}
