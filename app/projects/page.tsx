@@ -1,4 +1,4 @@
-import { CrumpledPaperIcon, ExternalLinkIcon } from "@radix-ui/react-icons";
+import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 
 type Project = {

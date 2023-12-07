@@ -2,8 +2,6 @@
 
 import { ExternalLinkIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { cn } from "../lib/cn";
-import { useEffect, useRef, useState } from "react";
 
 type Experience = {
 	name: string;

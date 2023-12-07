@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./collapsible";

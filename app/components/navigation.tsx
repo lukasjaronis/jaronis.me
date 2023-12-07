@@ -34,23 +34,28 @@ export const Navigation = () => {
 
 		if (!body) return;
 
-		let timer: ReturnType<typeof setTimeout>;
-
 		const registeredLeftNav = registerNav(body, "ArrowLeft", "work");
 		const registeredRightNav = registerNav(body, "ArrowRight", "projects");
 		const registeredUpNav = registerNav(body, "ArrowUp", "intro");
+
+		return () => {
+			registeredLeftNav.unregister();
+			registeredRightNav.unregister();
+			registeredUpNav.unregister();
+		};
+	}, []);
+
+	useEffect(() => {
+		let timer: ReturnType<typeof setTimeout>;
 
 		timer = setTimeout(() => {
 			setIsInitial(false);
 		}, 1500);
 
 		return () => {
-			registeredLeftNav.unregister();
-			registeredRightNav.unregister();
-			registeredUpNav.unregister();
 			clearTimeout(timer);
-		};
-	}, []);
+		}
+	}, [])
 
 	const registerNav = (
 		body: HTMLBodyElement,
