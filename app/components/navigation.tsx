@@ -62,7 +62,9 @@ export const Navigation = () => {
 				setTriggeredNav(undefined);
 
 				if (page) {
-					router.replace("/" + page);
+					if (page !== window.location.pathname.replace('/', '')) {
+						router.replace("/" + page);
+					}
 				}
 			}
 		};
