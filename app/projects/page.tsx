@@ -23,7 +23,7 @@ const projects: Project[] = [
 		name: "Spaced Star Club (nft project)",
 		description:
 			"Implemented and deployed an Ethereum ERC-721 contract + UI + cloud deployment.",
-		link: '/posts/ssc'
+		link: "/posts/ssc",
 	},
 ];
 

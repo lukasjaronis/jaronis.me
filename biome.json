@@ -11,6 +11,6 @@
 		"indentWidth": 4,
 		"enabled": true,
 		"lineWidth": 100,
-		"ignore": ["node_modules", ".next"]
+		"ignore": ["node_modules", ".next", ".contentlayer"]
 	}
 }
