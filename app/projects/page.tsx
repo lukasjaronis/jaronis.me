@@ -5,7 +5,6 @@ type Project = {
 	name: string;
 	description: string;
 	link?: string;
-	blog?: string
 };
 
 const projects: Project[] = [
@@ -24,7 +23,7 @@ const projects: Project[] = [
 		name: "Spaced Star Club (nft project)",
 		description:
 			"Implemented and deployed an Ethereum ERC-721 contract + UI + cloud deployment.",
-		blog: '/posts/ssc'
+		link: '/posts/ssc'
 	},
 ];
 
@@ -40,11 +39,6 @@ export default function Projects() {
 									{project.link && (
 										<Link href={project.link} passHref target="_blank">
 											<ExternalLinkIcon />
-										</Link>
-									)}
-									{project.blog && (
-											<Link href={project.blog} passHref target="_blank">
-											<CrumpledPaperIcon />
 										</Link>
 									)}
 									<h4 className="font-geist_mono text-ice-cold-500">

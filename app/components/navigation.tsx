@@ -172,7 +172,7 @@ export const Navigation = () => {
 						animate="visible"
 						className="w-10 h-10 flex items-center justify-center"
 					>
-						<KeyboardIcon className="h-6 w-6 text-ice-cold-100" />
+						<KeyboardIcon className="h-6 w-6 text-firefly-200" />
 					</motion.div>
 					<motion.button
            disabled={pathname === 'projects'}
