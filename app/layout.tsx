@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { Navigation } from "./components/navigation";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://yebuntu.vercel.app"),
@@ -32,6 +33,7 @@ export default function RootLayout({
 				{children}
 				<Navigation />
 				<Analytics />
+				<SpeedInsights />
 			</body>
 		</html>
 	);
