@@ -9,36 +9,36 @@ import {
 	LinkedInLogoIcon,
 	EnvelopeClosedIcon,
 } from "@radix-ui/react-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { XIcon } from "../icons/x";
 import { AnimatePresence, Variants, motion } from "framer-motion";
 import { cn } from "../lib/cn";
 
-type TriggerNav = "ArrowLeft" | "ArrowRight" | "ArrowUp" | undefined;
+type KeyEvents = "ArrowLeft" | "ArrowRight" | "ArrowUp" | undefined;
 type Pages = "intro" | "projects" | "work";
 
-// TODO fix key events causing tab crash :)
-
 export const Navigation = () => {
+	/**
+	 * To solve tab crashes, we have to lock in one key at a time and then reset it after route change.
+	 */
+	const currentLockedKey = useRef<KeyEvents>(undefined)
 	const [isInitial, setIsInitial] = useState(true);
+	const [heldKey, setHeldKey] = useState<KeyEvents>(undefined)
+
+
 	const pathname = usePathname().replace("/", "") as Pages;
 	const isContent = pathname.includes("posts/");
 	const router = useRouter();
 
-	const [triggeredNav, setTriggeredNav] = useState<TriggerNav>(undefined);
-	const onTriggerDown = (trigger: Exclude<TriggerNav, "undefined">) =>
-		triggeredNav === trigger || isInitial;
+	const onKeyEvent = (key: Exclude<KeyEvents, "undefined">) =>
+	heldKey === key || isInitial;
 
 	useEffect(() => {
-		const body = document.getElementsByTagName("body")[0];
-
-		if (!body) return;
-
-		const registeredLeftNav = registerNav(body, "ArrowLeft", "work");
-		const registeredRightNav = registerNav(body, "ArrowRight", "projects");
-		const registeredUpNav = registerNav(body, "ArrowUp", "intro");
+		const registeredLeftNav = registerNav("ArrowLeft", "work");
+		const registeredRightNav = registerNav("ArrowRight", "projects");
+		const registeredUpNav = registerNav("ArrowUp", "intro");
 
 		return () => {
 			registeredLeftNav.unregister();
@@ -60,40 +60,53 @@ export const Navigation = () => {
 	}, [])
 
 	const registerNav = (
-		body: HTMLBodyElement,
-		key: Exclude<TriggerNav, "undefined">,
+		key: Exclude<KeyEvents, "undefined">,
 		page?: Pages,
 	) => {
-		const toggleUp = (event: KeyboardEvent) => {
+		/**
+		 * onKeyUp triggers a route change
+		 */
+		const onKeyUp = (event: KeyboardEvent) => {
 			if (event.key === key) {
-				setTriggeredNav(undefined);
-
-				if (page) {
-					if (page !== window.location.pathname.replace('/', '')) {
-						router.replace("/" + page);
+				// check if locked key is the same as the incoming key event
+				if (currentLockedKey.current === event.key) {
+					if (page) {
+						if (page !== window.location.pathname.replace('/', '')) {
+							router.replace("/" + page);
+							// reset locked key
+							currentLockedKey.current = undefined
+						}
 					}
 				}
 			}
 		};
 
-		const toggleDown = (event: KeyboardEvent) => {
+		/**
+		 * onKeydown triggers a route request
+		 */
+		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key === key) {
 				event.preventDefault();
 
+				// Immediately reset initial 
 				if (isInitial) {
 					setIsInitial(false);
 				}
 
-				setTriggeredNav(key);
+
+				setHeldKey(key)
+
+				// Lock in the key
+				currentLockedKey.current = key
 			}
 		};
 
-		body.addEventListener("keyup", toggleUp);
-		body.addEventListener("keydown", toggleDown);
+		document.addEventListener("keyup", onKeyUp);
+		document.addEventListener("keydown", onKeyDown);
 		return {
 			unregister: () => {
-				body.removeEventListener("keyup", toggleUp);
-				body.removeEventListener("keydown", toggleDown);
+				document.removeEventListener("keyup", onKeyUp);
+				document.removeEventListener("keydown", onKeyDown);
 			},
 		};
 	};
@@ -139,7 +152,7 @@ export const Navigation = () => {
 					disabled={pathname === "work"}
 					initial="hidden"
 					variants={variants}
-					animate={onTriggerDown("ArrowLeft") ? "toggled" : "visible"}
+					animate={onKeyEvent("ArrowLeft") ? "toggled" : "visible"}
 					className={cn(
 						"group relative w-full h-full flex items-center justify-center"
 					)}
@@ -147,7 +160,7 @@ export const Navigation = () => {
 				>
 					<TriangleLeftIcon className={cn('h-6 w-6 text-ice-cold-100', !isInitial && pathname === "work" && "group-disabled:opacity-5",)} />
 					<AnimatePresence>
-						{onTriggerDown("ArrowLeft") && (
+						{onKeyEvent("ArrowLeft") && (
 							<motion.span
 								exit={{ opacity: 0 }}
 								className={cn(
@@ -164,7 +177,7 @@ export const Navigation = () => {
 					disabled={pathname === "intro"}
 					initial="hidden"
 					variants={variants}
-					animate={onTriggerDown("ArrowUp") ? "toggled" : "visible"}
+					animate={onKeyEvent("ArrowUp") ? "toggled" : "visible"}
 					className={cn(
 						"group relative w-full h-full flex items-center justify-center border-x-1 border-firefly-950"
 					)}
@@ -172,7 +185,7 @@ export const Navigation = () => {
 				>
 					<TriangleUpIcon className={cn('h-6 w-6 text-ice-cold-100', !isInitial && pathname === "intro" && "group-disabled:opacity-5",)} />
 					<AnimatePresence>
-						{onTriggerDown("ArrowUp") && (
+						{onKeyEvent("ArrowUp") && (
 							<motion.span
 								exit={{ opacity: 0 }}
 								className={cn(
@@ -189,7 +202,7 @@ export const Navigation = () => {
 					disabled={pathname === "projects"}
 					initial="hidden"
 					variants={variants}
-					animate={onTriggerDown("ArrowRight") ? "toggled" : "visible"}
+					animate={onKeyEvent("ArrowRight") ? "toggled" : "visible"}
 					className={cn(
 						"group relative w-full h-full flex items-center justify-center"
 					)}
@@ -197,7 +210,7 @@ export const Navigation = () => {
 				>
 					<TriangleRightIcon className={cn('h-6 w-6 text-ice-cold-100', !isInitial && pathname === "projects" && "group-disabled:opacity-5",)} />
 					<AnimatePresence>
-						{onTriggerDown("ArrowRight") && (
+						{onKeyEvent("ArrowRight") && (
 							<motion.span
 								exit={{ opacity: 0 }}
 								className={cn(
