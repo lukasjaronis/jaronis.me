@@ -19,6 +19,8 @@ import { cn } from "../lib/cn";
 type TriggerNav = "ArrowLeft" | "ArrowRight" | "ArrowUp" | undefined;
 type Pages = "intro" | "projects" | "work";
 
+// TODO fix key events causing tab crash :)
+
 export const Navigation = () => {
 	const [isInitial, setIsInitial] = useState(true);
 	const pathname = usePathname().replace("/", "") as Pages;
@@ -103,11 +105,11 @@ export const Navigation = () => {
 		visible: {
 			scale: 1,
 		},
-		toggled: { scale: 0.9 },
+		toggled: { scale: 0.85 },
 	};
 
 	return (
-		<div className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-start justify-center w-full backdrop-blur-sm h-32">
+		<div className="fixed inset-x-0 bottom-0 left-1/2 -translate-x-1/2 flex items-end justify-center w-full backdrop-blur-sm h-36">
 			{!isContent && (
 				<div className="absolute bottom-2 left-1/2 -translate-x-1/2">
 					<span className="font-geist_mono text-ice-cold-500">
@@ -129,26 +131,53 @@ export const Navigation = () => {
 					<EnvelopeClosedIcon className="h-4 w-4 text-ice-cold-500" />
 				</Link>
 			</div>
-			<div className="flex flex-col items-center">
+			<div className="absolute bottom-5 left-5 flex flex-col items-center gap-4">
+				<KeyboardIcon className="h-6 w-6 text-ice-cold-500 animate-pulse" />
+			</div>
+			<motion.div className={cn('relative mb-10 flex flex-row justify-between bg-firefly-900 w-full max-w-[125px] h-10 rounded-md')}>
+				<motion.button
+					disabled={pathname === "work"}
+					initial="hidden"
+					variants={variants}
+					animate={onTriggerDown("ArrowLeft") ? "toggled" : "visible"}
+					className={cn(
+						"group relative w-full h-full flex items-center justify-center"
+					)}
+					onClick={() => router.replace("/work")}
+				>
+					<TriangleLeftIcon className={cn('h-6 w-6 text-ice-cold-100', !isInitial && pathname === "work" && "group-disabled:opacity-5",)} />
+					<AnimatePresence>
+						{onTriggerDown("ArrowLeft") && (
+							<motion.span
+								exit={{ opacity: 0 }}
+								className={cn(
+									"absolute top-1/2 -translate-y-1/2 right-12 text-ice-cold-400",
+									!isInitial && "group-disabled:hidden",
+								)}
+							>
+								Work
+							</motion.span>
+						)}
+					</AnimatePresence>
+				</motion.button>
 				<motion.button
 					disabled={pathname === "intro"}
 					initial="hidden"
 					variants={variants}
 					animate={onTriggerDown("ArrowUp") ? "toggled" : "visible"}
 					className={cn(
-						"group relative bg-firefly-900 border-1 border-firefly-800 rounded-lg w-10 h-10 flex items-center justify-center",
-						!isInitial && pathname === "intro" && "disabled:opacity-5",
+						"group relative w-full h-full flex items-center justify-center border-x-1 border-firefly-950"
 					)}
 					onClick={() => router.replace("/intro")}
 				>
-					<TriangleUpIcon className="h-6 w-6 text-ice-cold-100" />
+					<TriangleUpIcon className={cn('h-6 w-6 text-ice-cold-100', !isInitial && pathname === "intro" && "group-disabled:opacity-5",)} />
 					<AnimatePresence>
 						{onTriggerDown("ArrowUp") && (
 							<motion.span
 								exit={{ opacity: 0 }}
 								className={cn(
 									"absolute bottom-12 right-1/2 translate-x-1/2 text-ice-cold-400",
-									!isInitial && "group-disable:hidden",
+									!isInitial && "group-disabled:hidden",
 								)}
 							>
 								Intro
@@ -156,69 +185,32 @@ export const Navigation = () => {
 						)}
 					</AnimatePresence>
 				</motion.button>
-				<div className="flex">
-					<motion.button
-						disabled={pathname === "work"}
-						initial="hidden"
-						variants={variants}
-						animate={onTriggerDown("ArrowLeft") ? "toggled" : "visible"}
-						className={cn(
-							"group relative bg-firefly-900 border-1 border-firefly-800 rounded-lg w-10 h-10 flex items-center justify-center",
-							!isInitial && pathname === "work" && "disabled:opacity-5",
+				<motion.button
+					disabled={pathname === "projects"}
+					initial="hidden"
+					variants={variants}
+					animate={onTriggerDown("ArrowRight") ? "toggled" : "visible"}
+					className={cn(
+						"group relative w-full h-full flex items-center justify-center"
+					)}
+					onClick={() => router.replace("/projects")}
+				>
+					<TriangleRightIcon className={cn('h-6 w-6 text-ice-cold-100', !isInitial && pathname === "projects" && "group-disabled:opacity-5",)} />
+					<AnimatePresence>
+						{onTriggerDown("ArrowRight") && (
+							<motion.span
+								exit={{ opacity: 0 }}
+								className={cn(
+									"absolute top-1/2 -translate-y-1/2 left-12 text-ice-cold-400",
+									!isInitial && "group-disabled:hidden",
+								)}
+							>
+								Projects
+							</motion.span>
 						)}
-						onClick={() => router.replace("/work")}
-					>
-						<TriangleLeftIcon className="h-6 w-6 text-ice-cold-100" />
-						<AnimatePresence>
-							{onTriggerDown("ArrowLeft") && (
-								<motion.span
-									exit={{ opacity: 0 }}
-									className={cn(
-										"absolute top-1/2 -translate-y-1/2 right-12 text-ice-cold-400",
-										!isInitial && "group-disable:hidden",
-									)}
-								>
-									Work
-								</motion.span>
-							)}
-						</AnimatePresence>
-					</motion.button>
-					<motion.div
-						initial="hidden"
-						variants={variants}
-						animate="visible"
-						className="w-10 h-10 flex items-center justify-center"
-					>
-						<KeyboardIcon className="h-6 w-6 text-firefly-200" />
-					</motion.div>
-					<motion.button
-						disabled={pathname === "projects"}
-						initial="hidden"
-						variants={variants}
-						animate={onTriggerDown("ArrowRight") ? "toggled" : "visible"}
-						className={cn(
-							"group relative bg-firefly-900 border-1 border-firefly-800 rounded-lg w-10 h-10 flex items-center justify-center",
-							!isInitial && pathname === "projects" && "disabled:opacity-5",
-						)}
-						onClick={() => router.replace("/projects")}
-					>
-						<TriangleRightIcon className="h-6 w-6 text-ice-cold-100" />
-						<AnimatePresence>
-							{onTriggerDown("ArrowRight") && (
-								<motion.span
-									exit={{ opacity: 0 }}
-									className={cn(
-										"absolute top-1/2 -translate-y-1/2 left-12 text-ice-cold-400",
-										!isInitial && "group-disabled:hidden",
-									)}
-								>
-									Projects
-								</motion.span>
-							)}
-						</AnimatePresence>
-					</motion.button>
-				</div>
-			</div>
+					</AnimatePresence>
+				</motion.button>
+			</motion.div>
 		</div>
 	);
 };
