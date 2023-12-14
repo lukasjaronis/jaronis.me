@@ -11,7 +11,7 @@ const projects: Project[] = [
 	{
 		name: "Gate",
 		description:
-			"A Cloudflare worker service for creating and verifying API keys with optional constraints such as limited usage and or rate limiting. Powered by the Cache API and Durable Objects.",
+			"A Cloudflare worker service for creating and verifying API keys with optional constraints such as limited usage and or rate limiting. Using D1 & planetscale (performance comparison).",
 		link: "https://github.com/lukasjaronis/cloud",
 	},
 	{
