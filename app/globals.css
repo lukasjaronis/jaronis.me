@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply relative bg-[#162226] text-firefly-300 scrollbar-none px-3 selection:bg-black;
+
+@layer base {
+  :root {
+    --background: 0 0% 5%;
+    --foreground: 0 0% 95%;
+
+    --grey01: 0 0% 85%;
+    --grey02: 0 0% 75%;
+    --grey03: 180 1% 35%;
+    --grey04: 120 1% 25%;
+
+    --destructive: 0 0 0;
+    --accent: 28 84% 69%;
+
+    --radius: 0.5rem;
+  }
+}
+ 
+@layer base {
+  body {
+    @apply relative bg-background text-foreground scrollbar-none;
+  }
 }

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useState } from "react";
 
@@ -35,7 +35,7 @@ export const CodeBlock = ({
 				</CollapsibleContent>
 				<div
 					className={cn(
-						"absolute flex items-center justify-center bg-gradient-to-b from-[#162226]/30 to-[#162226]/100 p-2",
+						"absolute flex items-center justify-center bg-gradient-to-b from-background/30 to-background/100 p-2",
 						isOpened ? "inset-x-0 bottom-0 h-12" : "inset-0",
 					)}
 				>

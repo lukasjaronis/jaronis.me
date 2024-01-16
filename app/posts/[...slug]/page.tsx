@@ -48,11 +48,9 @@ export default async function PostPage({ params }: PostProps) {
 	}
 
 	return (
-		<article className="px-1 py-10 flex flex-col items-center pb-[155px]">
-			<h1 className="mb-2 text-ice-cold-400 font-geist_mono">{post.title}</h1>
-			<div className="max-w-2xl">
-				<Mdx code={post.body.code} />
-			</div>
+		<article className="container py-10">
+			<h1 className="mb-2 font-geist_mono">{post.title}</h1>
+			<Mdx code={post.body.code} />
 		</article>
 	);
 }

@@ -2,9 +2,8 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
-import { Navigation } from "./components/navigation";
 import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
 	metadataBase: new URL("https://yebuntu.vercel.app"),
@@ -31,7 +30,6 @@ export default function RootLayout({
 		<html className={`${GeistSans.variable} ${GeistMono.variable}`} lang="en">
 			<body className="font-geist_sans">
 				{children}
-				<Navigation />
 				<Analytics />
 				<SpeedInsights />
 			</body>

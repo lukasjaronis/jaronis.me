@@ -10,7 +10,7 @@ const components = {
 	h3: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
 		<h3
 			className={cn(
-				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-ice-cold-400 text-3xl",
+				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-3xl",
 				className,
 			)}
 			{...props}
@@ -19,7 +19,7 @@ const components = {
 	h4: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
 		<h3
 			className={cn(
-				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-ice-cold-400 text-2xl",
+				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-2xl",
 				className,
 			)}
 			{...props}
@@ -28,7 +28,7 @@ const components = {
 	h5: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
 		<h3
 			className={cn(
-				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-ice-cold-400 text-xl",
+				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-xl",
 				className,
 			)}
 			{...props}
@@ -37,7 +37,7 @@ const components = {
 	h6: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
 		<h3
 			className={cn(
-				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-ice-cold-400 text-lg",
+				"leading-7 [&:not(:first-child)]:mt-6 font-geist_mono text-lg",
 				className,
 			)}
 			{...props}
@@ -69,7 +69,7 @@ const components = {
 		return (
 			<pre
 				className={cn(
-					"max-h-[650px] grid overflow-x-auto scrollbar-thin rounded-lg border-ice-cold-900 border-1",
+					"max-h-[650px] grid overflow-x-auto scrollbar-thin rounded-lg border-grey04 border-1",
 					className,
 				)}
 				{...props}
