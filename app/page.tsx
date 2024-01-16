@@ -22,27 +22,27 @@ export default function RootPage() {
         </Link>
       </div>
       <div>
-        <h1 className="text-2xl">Lukas Jaronis</h1>
-        <p className="text-sm text-grey02">Just a dev doing dev things</p>
+        <h1 className="text-4xl">Lukas Jaronis</h1>
+        <p className="text-lg text-grey02">Just a dev doing dev things</p>
       </div>
-      <div className="h-[1px] w-full bg-grey04 my-5" />
+      <div className="h-[1px] w-full bg-grey04 my-10" />
       <div className="space-y-5">
         {projects.map((project, idx) => (
           <div key={project.name}>
             <div className="flex items-center gap-2">
-              <h3>{project.name}</h3>
+              <h3 className="text-2xl">{project.name}</h3>
               {idx == 0 && (
-                <span className="text-accent text-xs font-geist_mono">
+                <span className="text-accent text-sm font-geist_mono">
                   (current)
                 </span>
               )}
               {project.demo && (
-                <Link href={project.demo} passHref target="_blank" className="text-xs font-geist_mono underline underline-offset-2">
+                <Link href={project.demo} passHref target="_blank" className="text-sm font-geist_mono underline underline-offset-2">
                   demo
                 </Link>
               )}
               {project.link && (
-                <Link href={project.link} passHref target="_blank" className="text-xs font-geist_mono underline underline-offset-2">
+                <Link href={project.link} passHref target="_blank" className="text-sm font-geist_mono underline underline-offset-2">
                   link
                 </Link>
               )}
@@ -51,21 +51,21 @@ export default function RootPage() {
           </div>
         ))}
       </div>
-      <div className="h-[1px] w-full bg-grey04 my-5" />
+      <div className="h-[1px] w-full bg-grey04 my-10" />
       <div className="space-y-5">
         {experiences.map((exp) => (
           <div key={exp.name}>
             <div className="flex items-center gap-2">
-              <h3>{exp.name}</h3>
+              <h3 className="text-2xl">{exp.name}</h3>
               {exp.link && (
-                <Link href={exp.link} passHref target="_blank" className="text-xs font-geist_mono underline underline-offset-2">
+                <Link href={exp.link} passHref target="_blank" className="text-sm font-geist_mono underline underline-offset-2">
                   link
                 </Link>
               )}
             </div>
             <div className="flex flex-row items-center justify-between">
               <p className="text-sm text-accent">{exp.role}</p>
-              <p className="text-xs text-grey02/80">{exp.date}</p>
+              <p className="text-sm text-grey02/80">{exp.date}</p>
             </div>
             <p className="text-sm text-grey02">{exp.description}</p>
           </div>
