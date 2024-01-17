@@ -43,7 +43,7 @@ export default function RootPage() {
               )}
               {project.link && (
                 <Link href={project.link} passHref target="_blank" className="text-sm font-geist_mono underline underline-offset-2">
-                  link
+                  {idx == 1 ? project.link : 'link'}
                 </Link>
               )}
             </div>

@@ -13,6 +13,11 @@ export const projects: Project[] = [
     demo: "https://youtu.be/DTw5lMCN8DY"
   },
   {
+    name: 'Cforty',
+    description: "Links with superpowers (tbd), but meet Cforty. Built on Cloudflare Workers.",
+    link: "https://cforty.yebuntu.workers.dev/👽"
+  },
+  {
     name: "Gate",
     description:
       "An intended self-hosting API for creating and verifying API keys with optional constraints such as limited usage and or rate limiting. Built on Cloudflare workers.",
