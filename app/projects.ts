@@ -14,7 +14,8 @@ export const projects: Project[] = [
   },
   {
     name: 'Cforty',
-    description: "An intended self-hosting link shortner with superpowers (tbd on the powers). Being build on Cloudflare Workers. "
+    description: "An intended self-hosting link shortner with superpowers (tbd on the powers). Being build on Cloudflare Workers. ",
+    link: "https://brrr.ing/🥶",
   },
   {
     name: "Gate",
